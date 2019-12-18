@@ -3,7 +3,7 @@ from time import sleep
 s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connected=False
 def serverstart():
-    HOST = '10.170.2.18'
+    HOST = ''
     PORT = 8019
     s.bind((HOST, PORT))
     s.listen(5) # Number of connections
@@ -16,7 +16,9 @@ def connect():
     print("Connected to", address)
     if client != None:
         return True
-
+def dissconnect():
+    dis="%disconect%"
+    client.sendall(dis.enode('utf-8'))
 def chat():
     # Receive data and decode using utf-8
     data = client.recv( 1024 ).decode( 'utf-8' )
