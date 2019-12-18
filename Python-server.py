@@ -18,16 +18,16 @@ def connect():
         return True
 def disconnect():
     client.sendall("%disconect%".encode('utf-8'))
-    client.close()
+    s.close()
     print("Disconnected")
 def chat():
     # Receive data and decode using utf-8
     data = client.recv( 1024 ).decode( 'utf-8' )
     if data != None:
-        if data =="%disconect%":
-            self.disconnect()
+        if data =="%disconnect%":
+            disconnect()
             print("Server disconnected")
-            chatting=False
+            connected=False
         else:
             print("Recieved :", repr(data))
             # Send data to client in utf-8
