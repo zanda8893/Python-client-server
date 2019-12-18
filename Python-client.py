@@ -5,18 +5,30 @@ class server():
     # Create s and connect it to server
     def connect(self):
         self.s.connect(('localhost',8019))
-    def dissconnect(self):
+        chatting==True
+        print("Connected to server")
+        return chatting
+    def dissconnect():
         self.s.close()
     # client loop
     def chat():
-        while True:
+        while chatting==True:
+            print("type Q to quit")
             message = input("Your Message: ")
-            s.send( message.encode('utf-8') )
-            print("Awaiting the reply...")
-            reply = s.recv( 1024 ).decode( 'utf-8' )
-            if reply =="%disconect%":
+            if message =="Q":
                 dissconnect()
-                print("Server dissconnected")
+                chatting=False
             else:
-                print("Recieved ", str(reply))
-server.s.connect()
+                s.send( message.encode('utf-8') )
+                print("Awaiting the reply...")
+                reply = s.recv( 1024 ).decode( 'utf-8' )
+                if reply =="%disconect%":
+                    dissconnect()
+                    print("Server dissconnected")
+                    chatting=False
+                else:
+                    print("Recieved ", str(reply))
+server = server()
+chatting=server.connect(self)
+sleep(1)
+server.chat()
