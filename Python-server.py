@@ -2,43 +2,44 @@ import socket
 from time import sleep
 s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connected=False
-def serverstart():
-    HOST = 'localhost'
-    PORT = 8019
-    s.bind((HOST, PORT))
-    s.listen(5) # Number of connections
-    print("Server started")
-def connect():
-    global client #global varables to be used in chat()
-    global address
-    # Accept connections
-    client, address = s.accept()
-    print("Connected to", address)
-    if client != None:
-        return True
-def disconnect():
-    client.sendall("%disconect%".encode('utf-8'))
-    s.close()
-    print("Disconnected")
-def chat():
-    # Receive data and decode using utf-8
-    data = client.recv( 1024 ).decode( 'utf-8' )
-    if data != None:
-        if data =="%disconnect%":
-            disconnect()
-            print("Server disconnected")
-            connected=False
-        else:
-            print("Recieved :", repr(data))
-            # Send data to client in utf-8
-            reply = input("Reply :")
-            reply=str(reply)
-            client.sendall( reply.encode('utf-8') ) # Make sure data gets there with sendall()
-
-serverstart()
+class server()
+    def serverstart():
+        HOST = 'localhost'
+        PORT = 8019
+        s.bind((HOST, PORT))
+        s.listen(5) # Number of connections
+        print("Server started")
+    def connect():
+        global client #global varables to be used in chat()
+        global address
+        # Accept connections
+        client, address = s.accept()
+        print("Connected to", address)
+        if client != None:
+            return True
+    def disconnect():
+        client.sendall("%disconnect%".encode('utf-8'))
+        s.close()
+        print("Disconnected")
+    def chat():
+        # Receive data and decode using utf-8
+        data = client.recv( 1024 ).decode( 'utf-8' )
+        if data != None:
+            if data =="%disconnect%":
+                disconnect()
+                print("Server disconnected")
+                connected=False
+            else:
+                print("Recieved :", repr(data))
+                # Send data to client in utf-8
+                reply = input("Reply :")
+                reply=str(reply)
+                client.sendall( reply.encode('utf-8') ) # Make sure data gets there with sendall()
+server=server()
+server.serverstart()
 while connected==False:
-    connected=connect()
+    connected=server.connect()
 if connected==True:
     while connected==True:
-        sleep(1)
-        chat()
+        sleep(0.1)
+        server.chat()
