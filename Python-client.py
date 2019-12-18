@@ -11,4 +11,3 @@ while True:
     print("Awaiting the reply...")
     reply = s.recv( 1024 ).decode( 'utf-8' )
     print("Recieved ", str(reply))
-    
