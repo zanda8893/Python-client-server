@@ -16,7 +16,7 @@ class server():
         client, address = s.accept()
         print("Connected to", address)
         if client != None:
-            return False
+            return True
     def disconnect(self):
         global chatting
         client.sendall("%disconnect%".encode('utf-8'))
