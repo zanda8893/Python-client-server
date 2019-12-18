@@ -1,5 +1,5 @@
 import socket
-class server():
+class client():
     def __init__(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Create s and connect it to server
@@ -30,6 +30,6 @@ class server():
                     chatting=False
                 else:
                     print("Recieved ", str(reply))
-server = server()
-server.connect()
-server.chat()
+client = client()
+client.connect()
+client.chat()
