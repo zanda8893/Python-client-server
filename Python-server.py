@@ -2,14 +2,14 @@ import socket
 from time import sleep
 s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connected=False
-class server()
-    def serverstart():
+class server():
+    def serverstart(self):
         HOST = 'localhost'
         PORT = 8019
         s.bind((HOST, PORT))
         s.listen(5) # Number of connections
         print("Server started")
-    def connect():
+    def connect(self):
         global client #global varables to be used in chat()
         global address
         # Accept connections
@@ -17,16 +17,16 @@ class server()
         print("Connected to", address)
         if client != None:
             return True
-    def disconnect():
+    def disconnect(self):
         client.sendall("%disconnect%".encode('utf-8'))
         s.close()
         print("Disconnected")
-    def chat():
+    def chat(self):
         # Receive data and decode using utf-8
         data = client.recv( 1024 ).decode( 'utf-8' )
         if data != None:
             if data =="%disconnect%":
-                disconnect()
+                self.disconnect()
                 print("Server disconnected")
                 connected=False
             else:
