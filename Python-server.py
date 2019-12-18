@@ -3,7 +3,7 @@ from time import sleep
 s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connected=False
 def serverstart():
-    HOST = ''
+    HOST = 'localhost'
     PORT = 8019
     s.bind((HOST, PORT))
     s.listen(5) # Number of connections
