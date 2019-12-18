@@ -2,7 +2,7 @@ import socket
 class client():
     def __init__(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # Create s and connect it to server
+        # Create s and connect it to server
     def connect(self):
         self.s.connect(('localhost',8019))
         self.chatting=True

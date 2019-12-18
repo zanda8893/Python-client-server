@@ -3,7 +3,7 @@ from time import sleep
 s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connected=False
 class server():
-    def serverstart(self):
+    def start(self):
         HOST = 'localhost'
         PORT = 8019
         s.bind((HOST, PORT))
@@ -18,9 +18,11 @@ class server():
         if client != None:
             return True
     def disconnect(self):
+        global chatting
         client.sendall("%disconnect%".encode('utf-8'))
         s.close()
         print("Disconnected")
+        chatting=False
     def chat(self):
         # Receive data and decode using utf-8
         data = client.recv( 1024 ).decode( 'utf-8' )
@@ -36,10 +38,14 @@ class server():
                 reply=str(reply)
                 client.sendall( reply.encode('utf-8') ) # Make sure data gets there with sendall()
 server=server()
-server.serverstart()
-while connected==False:
-    connected=server.connect()
-if connected==True:
-    while connected==True:
-        sleep(0.1)
-        server.chat()
+#server.serverstart()
+#while connected==False:
+#    connected=server.connect()
+#if connected==True:
+#    while connected==True:
+#        sleep(0.1)
+#        server.chat()
+server.start()
+chatting=server.connect()
+while chatting==True:
+    server.chat()
