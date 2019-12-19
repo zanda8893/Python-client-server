@@ -16,36 +16,30 @@ class server():
         client, address = s.accept()
         print("Connected to", address)
         if client != None:
-            return True
+            self.chatting=True
     def disconnect(self):
-        global chatting
         client.sendall("%disconnect%".encode('utf-8'))
         s.close()
         print("Disconnected")
-        chatting=False
+        self.chatting=False
     def chat(self):
+        print("type Q to quit")
         # Receive data and decode using utf-8
-        data = client.recv( 1024 ).decode( 'utf-8' )
-        if data != None:
-            if data =="%disconnect%":
-                self.disconnect()
-                print("Server disconnected")
-                connected=False
-            else:
-                print("Recieved :", repr(data))
-                # Send data to client in utf-8
-                reply = input("Reply :")
-                reply=str(reply)
-                client.sendall( reply.encode('utf-8') ) # Make sure data gets there with sendall()
+        while self.chatting == True:
+            data = client.recv( 1024 ).decode( 'utf-8' )
+            if data != None:
+                if data =="%disconnect%":
+                    self.disconnect()
+                else:
+                    print("Recieved :", repr(data))
+                    # Send data to client in utf-8
+                    reply = input("Reply :")
+                    reply=str(reply)
+                    if reply =="Q":
+                        self.disconnect()
+                    else:
+                        client.sendall( reply.encode('utf-8') ) # Make sure data gets there with sendall()
 server=server()
-#server.serverstart()
-#while connected==False:
-#    connected=server.connect()
-#if connected==True:
-#    while connected==True:
-#        sleep(0.1)
-#        server.chat()
 server.start()
-chatting=server.connect()
-while chatting==True:
-    server.chat()
+server.connect()
+server.chat()
