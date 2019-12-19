@@ -3,6 +3,10 @@ from time import sleep
 s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connected=False
 class server():
+    def __init__(self):
+        self.start()
+        self.connect()
+        self.chat()
     def start(self):
         HOST = 'localhost'
         PORT = 8019
@@ -22,6 +26,7 @@ class server():
         s.close()
         print("Disconnected")
         self.chatting=False
+        self.__init__()
     def chat(self):
         print("type Q to quit")
         # Receive data and decode using utf-8
@@ -39,7 +44,4 @@ class server():
                         self.disconnect()
                     else:
                         client.sendall( reply.encode('utf-8') ) # Make sure data gets there with sendall()
-server=server()
-server.start()
-server.connect()
-server.chat()
+server()
