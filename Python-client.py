@@ -32,8 +32,6 @@ class client():
             else:
                 print("Recieved ", str(reply)) # print recieved message
 client = client()
-print(threading.active_count())
-
 client.connect()
 while chatting==True:
     client.send()
