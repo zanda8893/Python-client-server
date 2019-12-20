@@ -1,2 +1,2 @@
 # Python-client-server
-<h1>Simple python client server communication</h1>
+<h1>Simple messaging app written in python</h1>
