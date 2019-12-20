@@ -31,7 +31,7 @@ class client():
     def receive(self):
         while self.chatting==True:
             #print("Test")
-            reply = self.s.recv( 1024 ).decode( 'utf-8' ) # Receive message decode with utf-8
+            reply = self.s.recv( 4096 ).decode( 'utf-8' ) # Receive message decode with utf-8
             if reply =="%disconnect%": # If client disconnects
                 self.disconnect() # Disconnect
             else:
