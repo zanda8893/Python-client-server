@@ -13,12 +13,13 @@ class server():
         s.bind((HOST, PORT))
         s.listen(5) # Number of connections
         print("Server started")
-    def connect(self):
-        # Accept connections
-        self.client, self.address = s.accept()
-        print("Connected to", self.address)
-        if self.client != None:
-            self.chatting=True
+    def connections(self):
+        while True:
+            # Accept connections
+            self.client, self.address = s.accept()
+            print("Connected to", self.address)
+            if self.client != None:
+                self.chatting=True
     def disconnect(self):
         self.client.sendall("%disconnect%".encode('utf-8'))
         s.close()
@@ -46,7 +47,8 @@ class server():
                     print("Recieved :", repr(data))
 server=server()
 server.start()
-server.connect()
+#server.connections()
+connections = Thread(name='server-connections', target=server.connections)
 send = Thread(name='server-send', target=server.send)
 receive = Thread(name='server-receive', target=server.receive)
 send.setDaemon(True)

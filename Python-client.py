@@ -9,7 +9,7 @@ class client():
         self.count = 0
         # Create s and connect it to server
     def connect(self):
-        self.s.connect(('localhost',8019))
+        self.s.connect(('92.18.41.79',8019))
         self.chatting=True # Now Chatting
         print("Connected to server")
     def disconnect(self):
