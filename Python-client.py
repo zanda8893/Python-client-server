@@ -9,7 +9,7 @@ class client():
         self.count = 0
         # Create s and connect it to server
     def connect(self):
-        self.s.connect(('92.18.41.79',8019))
+        self.s.connect(('localhost',8019))
         self.chatting=True # Now Chatting
         print("Connected to server")
     def disconnect(self):
@@ -26,7 +26,7 @@ class client():
             if self.count ==0:
                 print("type Q to quit")
                 self.count+=1
-            message = input("Your Message: ")
+            message = input("\nYour Message: ")
             if message =="Q":
                 self.disconnect() #disconnect
             else:
@@ -41,11 +41,7 @@ class client():
                 print("\nRecieved ", str(reply)) # print recieved message
 client = client()
 client.connect()
-send = Thread(name='client-send', target=client.send)
-receive = Thread(name='client-receive', target=client.receive)
-send.setDaemon(True)
-receive.setDaemon(True)
-send.start()
-receive.start()
+Thread(name='client-send', target=client.send, daemon=True).start()
+Thread(name='client-receive', target=client.receive, daemon=True).start()
 while run== True:
     pass
