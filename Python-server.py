@@ -1,8 +1,12 @@
-import socket
 from time import sleep
+from threading import Thread
+import socket
+global run
+run=True
 s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-connected=False
 class server():
+    def __init__(self):
+        self.chatting = False
     def start(self):
         HOST = 'localhost'
         PORT = 8019
@@ -10,42 +14,44 @@ class server():
         s.listen(5) # Number of connections
         print("Server started")
     def connect(self):
-        global client #global varables to be used in chat()
-        global address
         # Accept connections
-        client, address = s.accept()
-        print("Connected to", address)
-        if client != None:
-            return True
+        self.client, self.address = s.accept()
+        print("Connected to", self.address)
+        if self.client != None:
+            self.chatting=True
     def disconnect(self):
-        global chatting
-        client.sendall("%disconnect%".encode('utf-8'))
+        self.client.sendall("%disconnect%".encode('utf-8'))
         s.close()
         print("Disconnected")
-        chatting=False
-    def chat(self):
-        # Receive data and decode using utf-8
-        data = client.recv( 1024 ).decode( 'utf-8' )
-        if data != None:
-            if data =="%disconnect%":
+        self.chatting=False
+        run=False
+    def send(self):
+        while self.chatting==True:
+            # Send data to client in utf-8
+            reply = input("Reply :")
+            reply=str(reply)
+            if reply =="Q":
                 self.disconnect()
-                print("Server disconnected")
-                connected=False
             else:
-                print("Recieved :", repr(data))
-                # Send data to client in utf-8
-                reply = input("Reply :")
-                reply=str(reply)
-                client.sendall( reply.encode('utf-8') ) # Make sure data gets there with sendall()
+                self.client.sendall( reply.encode('utf-8') ) # Make sure data gets there with sendall()
+    def receive(self):
+        print("type Q to quit")
+        # Receive data and decode using utf-8
+        while self.chatting == True:
+            data = self.client.recv( 4096 ).decode( 'utf-8' )
+            if data != None:
+                if data =="%disconnect%":
+                    self.disconnect()
+                else:
+                    print("Recieved :", repr(data))
 server=server()
-#server.serverstart()
-#while connected==False:
-#    connected=server.connect()
-#if connected==True:
-#    while connected==True:
-#        sleep(0.1)
-#        server.chat()
 server.start()
-chatting=server.connect()
-while chatting==True:
-    server.chat()
+server.connect()
+send = Thread(name='server-send', target=server.send)
+receive = Thread(name='server-receive', target=server.receive)
+send.setDaemon(True)
+receive.setDaemon(True)
+send.start()
+receive.start()
+while run==True:
+    pass
