@@ -1,7 +1,8 @@
 from time import sleep
 from threading import Thread
 import socket
-
+global run
+run=True
 class client():
     def __init__(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -13,10 +14,12 @@ class client():
         print("Connected to server")
     def disconnect(self):
         global chatting
+        global run
         self.s.send( "%disconnect%".encode('utf-8') ) # send disconnect message to client
         self.s.close() # close socket
         self.chatting=False # no longer chatting
         print("Disconnect from server \nPress anykey to exit") # Tell user about discconnect
+        run=False
     def send(self):
         while self.chatting==True:
             #print("running")
@@ -27,7 +30,7 @@ class client():
             if message =="Q":
                 self.disconnect() #disconnect
             else:
-                self.s.send( message.encode('utf-8') ) # send message encode with utf-8
+                self.s.send( message.encode('utf-8') ) # send message encode with   utf-8
     def receive(self):
         while self.chatting==True:
             #print("Test")
@@ -44,5 +47,5 @@ send.setDaemon(True)
 receive.setDaemon(True)
 send.start()
 receive.start()
-while True:
+while run== True:
     pass
