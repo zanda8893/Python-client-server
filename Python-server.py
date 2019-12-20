@@ -1,12 +1,12 @@
-import socket
 from time import sleep
+from threading import Thread
+import socket
+global run
+run=True
 s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 class server():
     def __init__(self):
         self.chatting = False
-        self.start()
-        self.connect()
-        self.chat()
     def start(self):
         HOST = 'localhost'
         PORT = 8019
@@ -24,17 +24,7 @@ class server():
         s.close()
         print("Disconnected")
         self.chatting=False
-        self.__init__()
-    def receive(self):
-        print("type Q to quit")
-        # Receive data and decode using utf-8
-        while self.chatting == True:
-            data = self.client.recv( 1024 ).decode( 'utf-8' )
-            if data != None:
-                if data =="%disconnect%":
-                    self.disconnect()
-                else:
-                    print("Recieved :", repr(data))
+        run=False
     def send(self):
         while self.chatting==True:
             # Send data to client in utf-8
@@ -44,4 +34,24 @@ class server():
                 self.disconnect()
             else:
                 self.client.sendall( reply.encode('utf-8') ) # Make sure data gets there with sendall()
-server()
+    def receive(self):
+        print("type Q to quit")
+        # Receive data and decode using utf-8
+        while self.chatting == True:
+            data = self.client.recv( 4096 ).decode( 'utf-8' )
+            if data != None:
+                if data =="%disconnect%":
+                    self.disconnect()
+                else:
+                    print("Recieved :", repr(data))
+server=server()
+server.start()
+server.connect()
+send = Thread(name='server-send', target=server.send)
+receive = Thread(name='server-receive', target=server.receive)
+send.setDaemon(True)
+receive.setDaemon(True)
+send.start()
+receive.start()
+while run==True:
+    pass
