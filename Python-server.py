@@ -5,18 +5,20 @@ import socket
 global run
 #global varaibles
 run=True
-s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s= socket.socket(socket.AF_INET, socket.SOCK_STREAM) #Define parameters for socket connection
 class server():
+
     def __init__(self):
-        self.chatting = False
+        self.chatting = False #Not Chatting
         self.old_client=0
 
     def start(self):
         HOST = 'localhost'
         PORT = 8019
-        s.bind((HOST, PORT))
+        s.bind((HOST, PORT)) #bind port and host
         s.listen(5) # Number of connections
         print("Server started")
+
     def connections(self):
         numclient=0 # set the number of clients to zero
         while True:
@@ -24,20 +26,20 @@ class server():
             print("Connected to", self.address)
             self.old_client=str(self.client)
             print("New client")
-            numclient+=1
-            self.chatting=True
-            Thread(name='server-send client:'+str(numclient), target=server.send, args=(self.client,), daemon=True).start()
-            Thread(name='server-receive client:'+str(numclient), target=server.receive, args=(self.client,), daemon=True).start()
+            numclient+=1 #Add 1 to keep track of clients
+            self.chatting=True #Now Chatting
+            Thread(name='server-send client:'+str(numclient), target=server.send, args=(self.client,), daemon=True).start()     #Start thread to send data to client
+            Thread(name='server-receive client:'+str(numclient), target=server.receive, args=(self.client,), daemon=True).start()   #Start thread to recieve data from client
 
     def disconnect(self,client):
-        self.client.sendall("%disconnect%".encode('utf-8'))
-        s.close()
+        self.client.sendall("%disconnect%".encode('utf-8'))     #Send disconnect
+        s.close() #close socket
         print("Disconnected")
-        self.chatting=False
+        self.chatting=False #No longer Chatting
         run=False
 
     def send(self,client):
-        if self.chatting==True:
+        if self.chatting==True: #While chatting
             while self.chatting==True:
                 # Send data to client in utf-8
                 reply = input("\nSend :")
@@ -48,10 +50,10 @@ class server():
                     client.sendall( reply.encode('utf-8') ) # Make sure data gets there with sendall()
         else:
             sleep(2)
-            self.send()
+            self.send() #Call it's self to handle new connections
 
     def receive(self,client):
-        if self.chatting==True:
+        if self.chatting==True: #While chatting
             print("type Q to quit")
             # Receive data and decode using utf-8
             while self.chatting == True:
@@ -66,7 +68,7 @@ class server():
                         lock.release()
         else:
             sleep(2)
-            self.receive()
+            self.receive() #Call it's self to handle new connections
 
 server=server()
 server.start()
