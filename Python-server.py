@@ -2,8 +2,8 @@ from time import sleep
 from threading import Thread
 import socket
 global run
-import json
-import sqlite3
+import json #needed later
+import sqlite3 as sql #for the logging in
 
 run=True
 s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -13,9 +13,16 @@ class server():
         self.chatting = False
         self.old_client=0
     def start(self):
-        HOST = 'localhost'
+        loop = True
+        while loop == True:
+            ip = raw_input("input ip or domain name ")
+            try:
+                ip = socket.gethostbyname(ip)
+                loop = False
+            except:
+                pass
         PORT = 8019
-        s.bind((HOST, PORT))
+        s.bind((ip, PORT))
         s.listen(5) # Number of connections
         print("Server started")
     def connections(self):
@@ -28,6 +35,7 @@ class server():
             self.old_client=str(self.client)
             numclient+=1
             self.chatting=True
+            self.authenticate()
             Thread(name='server-send client:'+str(numclient), target=server.send, args=(self.client,), daemon=True).start()
             Thread(name='server-receive client:'+str(numclient), target=server.receive, args=(self.client,), daemon=True).start()
 
@@ -67,6 +75,32 @@ class server():
             sleep(2)
             self.receive()
 
+    def authenticate(self,client):
+        login = False
+        if self.chatting!=True:
+            # Receive data and decode using utf-8
+            while self.chatting == True and login == False:
+                data = self.client.recv( 4096 ).decode( 'utf-8' )
+                data2 = self.client.recv( 4096 ).decode( 'utf-8' )
+                if data != None:
+                    if data =="%disconnect%":
+                        self.disconnect()
+                    else:
+                        username = repr(data)
+                        password = repr(data2)
+                        #sql database comaprison there
+                        #temp filler
+                        if username == 'username' and password == 'password':
+                            reply = True
+                            login = True
+                            client.sendall( reply.encode('utf-8') )
+                        else:
+                            reply = False
+                            client.sendall( reply.encode('utf-8') )
+        else:
+            sleep(2)
+            self.receive()
+        #pull sql code from other program for logins
 server=server()
 server.start()
 #server.connections()
