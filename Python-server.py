@@ -3,12 +3,14 @@ from threading import Thread
 import threading
 import socket
 global run
+#global varaibles
 run=True
 s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 class server():
     def __init__(self):
         self.chatting = False
         self.old_client=0
+
     def start(self):
         HOST = 'localhost'
         PORT = 8019
