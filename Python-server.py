@@ -2,8 +2,12 @@ from time import sleep
 from threading import Thread
 import socket
 global run
+import json
+import sqlite3
+
 run=True
 s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 class server():
     def __init__(self):
         self.chatting = False
