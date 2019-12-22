@@ -1,5 +1,6 @@
 from time import sleep
 from threading import Thread
+import threading
 import socket
 global run
 run=True
@@ -21,7 +22,6 @@ class server():
             print("Connected to", self.address)
             self.old_client=str(self.client)
             print("New client")
-            self.old_client=str(self.client)
             numclient+=1
             self.chatting=True
             Thread(name='server-send client:'+str(numclient), target=server.send, args=(self.client,), daemon=True).start()
@@ -58,7 +58,10 @@ class server():
                     if data =="%disconnect%":
                         self.disconnect()
                     else:
+                        lock = threading.Lock()
+                        lock.acquire()
                         print("\nRecieved :", repr(data))
+                        lock.release()
         else:
             sleep(2)
             self.receive()
