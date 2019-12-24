@@ -55,9 +55,17 @@ class client():
                 self.disconnect() # Disconnect
             else:
                 print("\nRecieved ", reply) # print recieved message
-                self.listbox.insert(END, reply)
+                lstbox=gui.messaging.listbox
+                lstbox.insert(END, reply)
+class gui():
 
-    def gui(self):
+    def __init__(self):
+        pass
+
+    def login(self):
+        pass
+
+    def messaging(self):
         global message
         window = Tk()
         #Window settings
@@ -77,13 +85,15 @@ class client():
         btn.grid(column=0, row=2)
         #End Button
         #Msg list
-        self.listbox = Listbox(window, height=15, width=50)
-        self.listbox.grid(column=1,row=0)
+        listbox = Listbox(window, height=15, width=50)
+        listbox.grid(column=1,row=0)
         #End msg list
         window.mainloop()
+
 client = client()
+gui = gui()
 client.connect()
 Thread(name='client-receive', target=client.receive, daemon=True).start()
-client.gui()
+gui.messaging()
 while run== True:
     pass
