@@ -62,7 +62,7 @@ class client():
         window = Tk()
         #Window settings
         window.title("Python Messenger")
-        window.geometry('350x200')
+        window.geometry('500x500')
         #End windows settings
         #Text
         lbl = Label(window, text="Enter message to send:")
@@ -77,7 +77,7 @@ class client():
         btn.grid(column=0, row=2)
         #End Button
         #Msg list
-        self.listbox = Listbox(window)
+        self.listbox = Listbox(window, height=15, width=50)
         self.listbox.grid(column=1,row=0)
         #End msg list
         window.mainloop()
