@@ -40,7 +40,7 @@ class client():
         msg = message.get()
         msg = str(msg)
         self.log.writelines("\n"+repr(datetime.time())+" : sent: "+msg)
-        if message =="Q":
+        if msg =="Q":
             self.disconnect() #disconnect
         else:
             self.s.send( msg.encode('utf-8') ) # send message encode with utf-8
@@ -50,10 +50,12 @@ class client():
             #print("Test")
             reply = self.s.recv( 4096 ).decode( 'utf-8' ) # Receive message decode with utf-8
             self.log.writelines("\n"+repr(datetime.time())+" : received: "+reply)
+            reply = str(reply)
             if reply =="%disconnect%": # If client disconnects
                 self.disconnect() # Disconnect
             else:
-                print("\nRecieved ", str(reply)) # print recieved message
+                print("\nRecieved ", reply) # print recieved message
+                self.listbox.insert(END, reply)
 
     def gui(self):
         global message
@@ -69,16 +71,19 @@ class client():
         #Text entry
         message = Entry(window,width=10)
         message.grid(column=0,row=1)
-        print(message)
         #End text entry
         #Button
         btn = Button(window, text="Send", command=client.send)
         btn.grid(column=0, row=2)
         #End Button
+        #Msg list
+        self.listbox = Listbox(window)
+        self.listbox.grid(column=1,row=0)
+        #End msg list
         window.mainloop()
 client = client()
 client.connect()
-#Thread(name='client-receive', target=client.receive, daemon=True).start()
+Thread(name='client-receive', target=client.receive, daemon=True).start()
 client.gui()
 while run== True:
     pass
