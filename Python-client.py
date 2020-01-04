@@ -8,6 +8,7 @@ from tkinter import *
 #global varaibles
 global run
 global message
+global gui
 run=True
 
 class client():
@@ -54,36 +55,47 @@ class client():
             if reply =="%disconnect%": # If client disconnects
                 self.disconnect() # Disconnect
             else:
+                global gui
                 print("\nRecieved ", reply) # print recieved message
-                self.listbox.insert(END, reply)
+                lstbox=gui.listbox
+                lstbox.insert(END, reply)
+class gui():
 
-    def gui(self):
+    def __init__(self):
+        pass
+
+    def login(self):
+        pass
+
+    def messaging(self):
         global message
-        window = Tk()
+        self.window = Tk()
         #Window settings
-        window.title("Python Messenger")
-        window.geometry('500x500')
+        self.window.title("Python Messenger")
+        self.window.geometry('500x500')
         #End windows settings
         #Text
-        lbl = Label(window, text="Enter message to send:")
+        lbl = Label(self.window, text="Enter message to send:")
         lbl.grid(column=0, row=0)
         #End Text
         #Text entry
-        message = Entry(window,width=10)
+        message = Entry(self.window,width=10)
         message.grid(column=0,row=1)
         #End text entry
         #Button
-        btn = Button(window, text="Send", command=client.send)
+        btn = Button(self.window, text="Send", command=client.send)
         btn.grid(column=0, row=2)
         #End Button
         #Msg list
-        self.listbox = Listbox(window, height=15, width=50)
+        self.listbox = Listbox(self.window, height=15, width=50)
         self.listbox.grid(column=1,row=0)
         #End msg list
-        window.mainloop()
+        self.window.mainloop()
+
 client = client()
+gui = gui()
 client.connect()
 Thread(name='client-receive', target=client.receive, daemon=True).start()
-client.gui()
+gui.messaging()
 while run== True:
     pass
