@@ -2,6 +2,8 @@ from time import sleep
 from threading import Thread
 import threading
 import socket
+import sqlite3
+import getpass
 global run
 #global varaibles
 run=True
@@ -11,6 +13,16 @@ class server():
     def __init__(self):
         self.chatting = False #Not Chatting
         self.old_client=0
+        self.dbsetup()
+        self.login=False
+
+    def dbsetup(self):
+        self.db = sqlite3.connect("Server.db")
+        self.cursor=self.db.cursor()
+        self.cursor.execute(""" CREATE TABLE IF NOT EXISTS Users(
+        id integer PRIMARY KEY,
+        username text NOT NULL,
+        passwords text NOT NULL); """)
 
     def start(self):
         HOST = 'localhost'
@@ -28,8 +40,24 @@ class server():
             print("New client")
             numclient+=1 #Add 1 to keep track of clients
             self.chatting=True #Now Chatting
+            login=Thread(name="login", target=server.login, args=(self.client,)).start()
+            login.join()
             Thread(name='server-send client:'+str(numclient), target=server.send, args=(self.client,), daemon=True).start()     #Start thread to send data to client
             Thread(name='server-receive client:'+str(numclient), target=server.receive, args=(self.client,), daemon=True).start()   #Start thread to recieve data from client
+
+    def login(self,client):
+        client.sendall( "%login%".encode('utf-8') )
+        while self.login==False:
+            userinfo = self.client.recv( 4096 ).decode( 'utf-8' )
+            if userinfo != None:
+                userinfo = userinfo.split()
+                print(userinfo)
+                cursor.execute("SELECT * FROM Users WHERE Username=? Password=?",(userinfo[0],userinfo[1]))
+                usersql = cursor.fetchall()
+                for row in usersql:
+                    print(row)
+                if login ==True:
+                    self.chatting=True
 
     def disconnect(self,client):
         self.client.sendall("%disconnect%".encode('utf-8'))     #Send disconnect
@@ -70,11 +98,20 @@ class server():
             sleep(2)
             self.receive() #Call it's self to handle new connections
 
+    def addusers(self):
+        name = input("Enter username:")
+        password = getpass.getpass(prompt='Password: ', stream=None)
+        self.cursor.execute(""" INSERT INTO Users(username,passwords)
+        VALUES (?,?)""",(name,password))
+        self.sqlClose()
+
+    def sqlClose(self):
+        self.db.commit()
+        self.cursor.close()
+
 server=server()
 server.start()
-#server.connections()
-connections = Thread(name='server-connections', target=server.connections)
-connections.setDaemon(True)
-connections.start()
+Thread(name='server-connections', target=server.connections, daemon=True).start()
 while run==True:
     pass
+#server.addusers()
