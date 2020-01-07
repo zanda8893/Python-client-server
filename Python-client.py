@@ -4,7 +4,6 @@ import socket
 import datetime as datetime
 from tkinter import *
 
-
 #global varaibles
 global run
 global message
@@ -63,14 +62,21 @@ class gui():
         pass
 
     def login(self):
-        pass
-
+        lgnwindow = Tk()
+        #Window settings
+        lgnwindow.title("Python Messenger")
+        lgnwindow.geometry('256x144')
+        #End windows settings
+        #Text
+        lbl = Label(lgnwindow, text="Enter message to send:")
+        lbl.grid(column=0, row=0)
+        #End Text
     def messaging(self):
         global message
         window = Tk()
         #Window settings
         window.title("Python Messenger")
-        window.geometry('500x500')
+        window.geometry('640x360')
         #End windows settings
         #Text
         lbl = Label(window, text="Enter message to send:")
@@ -92,8 +98,9 @@ class gui():
 
 client = client()
 gui = gui()
-client.connect()
-Thread(name='client-receive', target=client.receive, daemon=True).start()
-gui.messaging()
+#client.connect()
+#Thread(name='client-receive', target=client.receive, daemon=True).start()
+#gui.messaging()
+gui.login()
 while run== True:
     pass
