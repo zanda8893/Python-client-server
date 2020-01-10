@@ -3,7 +3,7 @@ from threading import Thread
 import socket
 import datetime as datetime
 from tkinter import *
-
+from functools import partial
 #global varaibles
 global run
 global message
@@ -14,6 +14,7 @@ class client():
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.count = 0
         self.log = open("Chat_log","a")
+        self.gui = gui()
 
     def connect(self):
         self.s.connect(('localhost',8019))
@@ -31,18 +32,14 @@ class client():
         self.log.close()
         run=False
 
-    def send(self):
-        global message
-        #print("running")
-        if self.count ==0:
-            self.count+=1
-        msg = message.get()
+    def send(self,msg):
         msg = str(msg)
         self.log.writelines("\n"+repr(datetime.time())+" : sent: "+msg)
         if msg =="Q":
             self.disconnect() #disconnect
         else:
             self.s.send( msg.encode('utf-8') ) # send message encode with utf-8
+            print(msg)
 
     def receive(self):
         while self.chatting==True:
@@ -56,6 +53,15 @@ class client():
                 print("\nRecieved ", reply) # print recieved message
                 lstbox=gui.messaging.listbox
                 lstbox.insert(END, reply)
+
+    def login(self,username,password):
+        if username and password == "gui":
+            username = gui.username.get()
+            password = gui.password.get()
+        user = (str(username)+" "+str(password))
+        print(user)
+        self.send(user)
+
 class gui():
 
     def __init__(self):
@@ -68,9 +74,21 @@ class gui():
         lgnwindow.geometry('256x144')
         #End windows settings
         #Text
-        lbl = Label(lgnwindow, text="Enter message to send:")
-        lbl.grid(column=0, row=0)
+        lbluser = Label(lgnwindow, text="Username:")
+        lbluser.grid(column=0, row=0)
+        lblpass = Label(lgnwindow, text="Password:")
+        lblpass.grid(column=0, row=1)
         #End Text
+        #Text entry
+        self.username = Entry(lgnwindow, width=10).grid(column=1, row=0)
+        self.password = Entry(lgnwindow, width=10).grid(column=1, row=1)
+        #Button
+        #sendlogin = client.login(username,password)
+        btn = Button(lgnwindow, text="Login", command=partial(client.login,"gui","gui"))
+        btn.grid(column=3, row=0)
+        #End Button
+        lgnwindow.mainloop()
+
     def messaging(self):
         global message
         window = Tk()
@@ -85,9 +103,10 @@ class gui():
         #Text entry
         message = Entry(window,width=10)
         message.grid(column=0,row=1)
+        message = message.get()
         #End text entry
         #Button
-        btn = Button(window, text="Send", command=client.send)
+        btn = Button(window, text="Send", command=client.send , args=message)
         btn.grid(column=0, row=2)
         #End Button
         #Msg list
@@ -98,9 +117,8 @@ class gui():
 
 client = client()
 gui = gui()
-#client.connect()
+client.connect()
 #Thread(name='client-receive', target=client.receive, daemon=True).start()
-#gui.messaging()
 gui.login()
 while run== True:
     pass
