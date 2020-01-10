@@ -14,7 +14,6 @@ class server():
         self.chatting = False #Not Chatting
         self.old_client=0
         self.dbsetup()
-        self.login=False
 
     def dbsetup(self):
         self.db = sqlite3.connect("Server.db")
@@ -23,6 +22,8 @@ class server():
         id integer PRIMARY KEY,
         username text NOT NULL,
         passwords text NOT NULL); """)
+        self.db.commit()
+        self.cursor.close()
 
     def start(self):
         HOST = 'localhost'
@@ -40,22 +41,28 @@ class server():
             print("New client")
             numclient+=1 #Add 1 to keep track of clients
             self.chatting=True #Now Chatting
-            login=Thread(name="login", target=server.login, args=(self.client,)).start()
-            login.join()
+            self.login(self.client)
             Thread(name='server-send client:'+str(numclient), target=server.send, args=(self.client,), daemon=True).start()     #Start thread to send data to client
             Thread(name='server-receive client:'+str(numclient), target=server.receive, args=(self.client,), daemon=True).start()   #Start thread to recieve data from client
 
     def login(self,client):
+        self.db = sqlite3.connect("Server.db")
+        self.cursor=self.db.cursor()
+        login = False
         client.sendall( "%login%".encode('utf-8') )
-        while self.login==False:
+        while login==False:
             userinfo = self.client.recv( 4096 ).decode( 'utf-8' )
             if userinfo != None:
                 userinfo = userinfo.split()
                 print(userinfo)
-                cursor.execute("SELECT * FROM Users WHERE Username=? Password=?",(userinfo[0],userinfo[1]))
+                username = userinfo[0]
+                password = userinfo[1]
+                self.cursor.execute("SELECT username FROM Users WHERE username=?", (username,))
                 usersql = cursor.fetchall()
                 for row in usersql:
                     print(row)
+                self.cursor.close()
+                userinfo = None
                 if login ==True:
                     self.chatting=True
 
@@ -99,13 +106,12 @@ class server():
             self.receive() #Call it's self to handle new connections
 
     def addusers(self):
+        self.db = sqlite3.connect("Server.db")
+        self.cursor=self.db.cursor()
         name = input("Enter username:")
         password = getpass.getpass(prompt='Password: ', stream=None)
         self.cursor.execute(""" INSERT INTO Users(username,passwords)
         VALUES (?,?)""",(name,password))
-        self.sqlClose()
-
-    def sqlClose(self):
         self.db.commit()
         self.cursor.close()
 
