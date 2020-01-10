@@ -34,6 +34,8 @@ class client():
 
     def send(self,msg):
         msg = str(msg)
+        if msg == "gui":
+            msg = message.get()
         self.log.writelines("\n"+repr(datetime.time())+" : sent: "+msg)
         if msg =="Q":
             self.disconnect() #disconnect
@@ -54,12 +56,12 @@ class client():
                 lstbox=gui.messaging.listbox
                 lstbox.insert(END, reply)
 
-    def login(self,username,password):
-        if username and password == "gui":
-            username = gui.username.get()
-            password = gui.password.get()
+    def login(self):
+        global username
+        global password
+        username = username.get()
+        password = password.get()
         user = (str(username)+" "+str(password))
-        print(user)
         self.send(user)
 
 class gui():
@@ -68,6 +70,8 @@ class gui():
         pass
 
     def login(self):
+        global username
+        global password
         lgnwindow = Tk()
         #Window settings
         lgnwindow.title("Python Messenger")
@@ -80,11 +84,13 @@ class gui():
         lblpass.grid(column=0, row=1)
         #End Text
         #Text entry
-        self.username = Entry(lgnwindow, width=10).grid(column=1, row=0)
-        self.password = Entry(lgnwindow, width=10).grid(column=1, row=1)
+        username = Entry(lgnwindow, width=10)
+        password = Entry(lgnwindow, width=10)
+        username.grid(column=1, row=0)
+        password.grid(column=1, row=1)
         #Button
         #sendlogin = client.login(username,password)
-        btn = Button(lgnwindow, text="Login", command=partial(client.login,"gui","gui"))
+        btn = Button(lgnwindow, text="Login", command=client.login)
         btn.grid(column=3, row=0)
         #End Button
         lgnwindow.mainloop()
@@ -103,10 +109,9 @@ class gui():
         #Text entry
         message = Entry(window,width=10)
         message.grid(column=0,row=1)
-        message = message.get()
         #End text entry
         #Button
-        btn = Button(window, text="Send", command=client.send , args=message)
+        btn = Button(window, text="Send", command=partial(client.send,"gui"))
         btn.grid(column=0, row=2)
         #End Button
         #Msg list

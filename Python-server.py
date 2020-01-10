@@ -46,6 +46,8 @@ class server():
             Thread(name='server-receive client:'+str(numclient), target=server.receive, args=(self.client,), daemon=True).start()   #Start thread to recieve data from client
 
     def login(self,client):
+        correctuser = False
+        correctpassword = False
         self.db = sqlite3.connect("Server.db")
         self.cursor=self.db.cursor()
         login = False
@@ -54,13 +56,20 @@ class server():
             userinfo = self.client.recv( 4096 ).decode( 'utf-8' )
             if userinfo != None:
                 userinfo = userinfo.split()
-                print(userinfo)
                 username = userinfo[0]
                 password = userinfo[1]
                 self.cursor.execute("SELECT username FROM Users WHERE username=?", (username,))
-                usersql = cursor.fetchall()
+                usersql = self.cursor.fetchall()
                 for row in usersql:
-                    print(row)
+                    if row == username:
+                        correctuser=True
+                self.cursor.execute("SELECT username FROM Users WHERE username=?", (username,))
+                usersql = self.cursor.fetchall()
+                for row in usersql:
+                    if row == password:
+                        correctpassword = True
+                if correctuser and correctpassword ==True:
+                    print("Logged in")
                 self.cursor.close()
                 userinfo = None
                 if login ==True:
