@@ -29,7 +29,7 @@ class server():
         HOST = 'localhost'
         PORT = 8019
         s.bind((HOST, PORT)) #bind port and host
-        s.listen(5) # Number of connections
+        s.listen(5) # Number of connections in backlog
         print("Server started")
 
     def connections(self):
@@ -41,11 +41,12 @@ class server():
             print("New client")
             numclient+=1 #Add 1 to keep track of clients
             self.chatting=True #Now Chatting
-            self.login(self.client)
-            Thread(name='server-send client:'+str(numclient), target=server.send, args=(self.client,), daemon=True).start()     #Start thread to send data to client
-            Thread(name='server-receive client:'+str(numclient), target=server.receive, args=(self.client,), daemon=True).start()   #Start thread to recieve data from client
+            clientname = self.login(self.client)
+            #Thread(name='server-send client:'+str(clientname), target=server.send, args=(self.client,), daemon=True).start()     #Start thread to send data to client
+            Thread(name='server-receive client:'+str(clientname), target=server.receive, args=(self.client,), daemon=True).start()   #Start thread to recieve data from client
 
     def login(self,client):
+        print("Running login")
         correctuser = False
         correctpassword = False
         self.db = sqlite3.connect("Server.db")
@@ -63,7 +64,7 @@ class server():
                 for row in usersql:
                     if row == username:
                         correctuser=True
-                self.cursor.execute("SELECT username FROM Users WHERE username=?", (username,))
+                self.cursor.execute("SELECT username FROM Users WHERE passwords=?", (password,))
                 usersql = self.cursor.fetchall()
                 for row in usersql:
                     if row == password:
@@ -74,6 +75,7 @@ class server():
                 userinfo = None
                 if login ==True:
                     self.chatting=True
+                    return username
 
     def disconnect(self,client):
         self.client.sendall("%disconnect%".encode('utf-8'))     #Send disconnect
@@ -123,6 +125,7 @@ class server():
         VALUES (?,?)""",(name,password))
         self.db.commit()
         self.cursor.close()
+
 
 server=server()
 server.start()
