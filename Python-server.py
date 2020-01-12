@@ -36,14 +36,15 @@ class server():
         numclient=0 # set the number of clients to zero
         while True:
             self.client, self.address = s.accept() # Accept connections
-            print("Connected to", self.address)
+            print("Connected to", self.address,"+",self.client)
             self.old_client=str(self.client)
             print("New client")
             numclient+=1 #Add 1 to keep track of clients
             self.chatting=True #Now Chatting
             clientname = self.login(self.client)
+            clientdata = [clientname,self.client]
             #Thread(name='server-send client:'+str(clientname), target=server.send, args=(self.client,), daemon=True).start()     #Start thread to send data to client
-            Thread(name='server-receive client:'+str(clientname), target=server.receive, args=(self.client,), daemon=True).start()   #Start thread to recieve data from client
+            Thread(name='server-receive client:'+str(clientname), target=server.receive, args=(clientdata,), daemon=True).start()   #Start thread to recieve data from client
 
     def login(self,client):
         print("Running login")
@@ -64,7 +65,7 @@ class server():
                 for row in usersql:
                     if row == username:
                         correctuser=True
-                self.cursor.execute("SELECT username FROM Users WHERE passwords=?", (password,))
+                self.cursor.execute("SELECT passwords FROM Users WHERE passwords=?", (password,))
                 usersql = self.cursor.fetchall()
                 for row in usersql:
                     if row == password:
@@ -84,37 +85,37 @@ class server():
         self.chatting=False #No longer Chatting
         run=False
 
-    def send(self,client):
-        if self.chatting==True: #While chatting
-            while self.chatting==True:
-                # Send data to client in utf-8
-                reply = input("\nSend :")
-                reply=str(reply)
-                if reply =="Q":
-                    self.disconnect(client)
-                else:
-                    client.sendall( reply.encode('utf-8') ) # Make sure data gets there with sendall()
-        else:
-            sleep(2)
-            self.send() #Call it's self to handle new connections
+    def send(self,client,msg):
+        client.sendall( msg.encode('utf-8') ) # Make sure data gets there with sendall()
 
-    def receive(self,client):
-        if self.chatting==True: #While chatting
-            print("type Q to quit")
-            # Receive data and decode using utf-8
-            while self.chatting == True:
-                data = self.client.recv( 4096 ).decode( 'utf-8' )
-                if data != None:
-                    if data =="%disconnect%":
-                        self.disconnect()
+    def receive(self,clientdata):
+        clientdata = clientdata.split()
+        sclient = clientdata[0]
+        username = clientdata[1]
+        while self.chatting == True:
+            data = sclient.recv( 4096 ).decode( 'utf-8' )
+            if data != None:
+                if data =="%disconnect%":
+                    self.disconnect()
+                    self.chatting = False
+                else:
+                    data = data.split()
+                    who = data[0]
+                    msg = data[1]
+                    rclient = user_search(who)
+                    if rclient = 0:
+                        self.send(sclient,"User not logged in")
                     else:
-                        lock = threading.Lock()
-                        lock.acquire()
-                        print("\nRecieved :", repr(data))
-                        lock.release()
+                        self.send(rclient,msg)
+
+    def user_search(self,username):
+        if username in self.users:
+            nameloc = self.users.index(username)
+            clientloc = namelocation+1
+            client = self.users[clientloc]
+            return client
         else:
-            sleep(2)
-            self.receive() #Call it's self to handle new connections
+            return 0
 
     def addusers(self):
         self.db = sqlite3.connect("Server.db")
@@ -125,7 +126,6 @@ class server():
         VALUES (?,?)""",(name,password))
         self.db.commit()
         self.cursor.close()
-
 
 server=server()
 server.start()
