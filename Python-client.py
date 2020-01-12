@@ -95,6 +95,14 @@ class gui():
         #End Button
         lgnwindow.mainloop()
 
+    def chat_select(self):
+        chatwindow = Tk()
+        #Window settings
+        chatwindow.title("Chat select")
+        chatwindow.geometry("576x324")
+        #End window settings
+        #text
+        lblchat = Label(chatwindow, text="Select chat:").grid(column=0, row=0)
     def messaging(self):
         global message
         window = Tk()
