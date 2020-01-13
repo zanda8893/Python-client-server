@@ -75,6 +75,7 @@ class server():
                 self.cursor.close()
                 userinfo = None
                 if login ==True:
+                    self.send(self.client,"%log%")
                     self.chatting=True
                     return username
 
@@ -103,7 +104,7 @@ class server():
                     who = data[0]
                     msg = data[1]
                     rclient = user_search(who)
-                    if rclient = 0:
+                    if rclient == 0:
                         self.send(sclient,"User not logged in")
                     else:
                         self.send(rclient,msg)

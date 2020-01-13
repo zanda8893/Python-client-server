@@ -59,10 +59,17 @@ class client():
     def login(self):
         global username
         global password
+        global logged
+        logged = False
         username = username.get()
         password = password.get()
         user = (str(username)+" "+str(password))
         self.send(user)
+        while logged != True:
+            msg = self.s.recv(4096).decode( "utf-8" )
+            if msg == "%log%":
+                logged = True
+
 
 class gui():
 
@@ -72,6 +79,7 @@ class gui():
     def login(self):
         global username
         global password
+        global logged
         lgnwindow = Tk()
         #Window settings
         lgnwindow.title("Python Messenger")
@@ -94,8 +102,13 @@ class gui():
         btn.grid(column=3, row=0)
         #End Button
         lgnwindow.mainloop()
+        if logged == True:
+            lgnwindow.quit()
+            lgnwindow.destroy()
+            self.chat_select()
 
     def chat_select(self):
+        global user
         chatwindow = Tk()
         #Window settings
         chatwindow.title("Chat select")
@@ -103,9 +116,21 @@ class gui():
         #End window settings
         #text
         lblchat = Label(chatwindow, text="Select chat:").grid(column=0, row=0)
+        # End Text
+        #Text entry
+        message = Entry(window,width=10)
+        message.grid(column=0,row=1)
+        #End text entry
+        #Start buttons
+        btn = Button(lgnwindow, text="Jack", command=self.messaging)
+        btn.grid(column=3, row=0)
+        #End buttons
+
+
     def messaging(self):
         global message
         window = Tk()
+        user = user.get()
         #Window settings
         window.title("Python Messenger")
         window.geometry('640x360')
@@ -119,7 +144,7 @@ class gui():
         message.grid(column=0,row=1)
         #End text entry
         #Button
-        btn = Button(window, text="Send", command=partial(client.send,"gui"))
+        btn = Button(window, text="Send", command=partial(client.send,user+"gui"))
         btn.grid(column=0, row=2)
         #End Button
         #Msg list
