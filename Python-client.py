@@ -93,7 +93,7 @@ class gui():
         #End Text
         #Text entry
         username = Entry(lgnwindow, width=10)
-        password = Entry(lgnwindow, width=10)
+        password = Entry(lgnwindow,show="*", width=10)
         username.grid(column=1, row=0)
         password.grid(column=1, row=1)
         #Button
